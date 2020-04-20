@@ -9,7 +9,8 @@
             "request": "launch",
             "version": "dev",
             "name": "Start",
-            "file": "${workspaceFolder}/translator.html"
+            "file": "${workspaceFolder}/translator.html",
+            "preLaunchTask": "${defaultBuildTask}"
         }
     ]
 }
