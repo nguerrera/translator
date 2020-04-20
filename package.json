@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@azure/cognitiveservices-translatortext": "^1.0.0"
+  }
+}
