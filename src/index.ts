@@ -1,4 +1,4 @@
 import {
-    TranslatorTextClient,
-    TranslatorTextModels,
+  TranslatorTextClient,
+  TranslatorTextModels,
 } from "@azure/cognitiveservices-translatortext";
