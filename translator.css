@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 11pt;
+}
+form {
+    display: table;
+    padding: 4px;
+}
+p {
+    display: table-row;
+}
+label {
+    display: table-cell;
+    padding: 4px;
+    text-align: right;
+    padding-right: 8px;
+}
+input {
+    display: table-cell;
+    width: 40em;
+}
+button {
+    margin-right: 4px;
+}
+textarea {
+    width: 49em;
+    height: 10em;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}

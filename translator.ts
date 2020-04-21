@@ -1,1 +1,4 @@
-document.body.textContent = "Hello World";
+import {
+    TranslatorTextClient,
+    TranslatorTextModels,
+} from "@azure/cognitiveservices-translatortext";

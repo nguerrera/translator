@@ -1,9 +1,41 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Translator</title>
-    </head>
-    <body>
-        <script src="bin/translator.js"></script>
-    </body>
+<html lang="en">
+
+<head>
+  <title>Translator</title>
+  <script src="bin/translator.js"></script>
+  <link rel="stylesheet" href="translator.css">
+</head>
+
+<body>
+  <h1>Translator</h1>
+  <form>
+    <div>
+      <p>
+        <label>API Endpoint: </label>
+        <input id="api-endpoint" type="text"
+          value="https://nguerrera-translator.cognitiveservices.azure.com/sts/v1.0/issuetoken">
+      </p>
+      <p>
+        <label>API Key:</label>
+        <input id="api-key" type="text">
+      </p>
+      <p>
+        <label>Translate from:</label>
+        <select id="source-language"></select>
+      </p>
+      <p>
+        <label>Translate to:</label>
+        <select id="target-language"></select>
+      </p>
+    </div>
+    <textarea id="source-text"></textarea>
+    <br>
+    <button id="translate-button">Translate</button>
+    <button id="swap-button">Swap</button>
+    <br>
+    <textarea id="target-text" readonly></textarea>
+  </form>
+</body>
+
 </html>
