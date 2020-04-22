@@ -13,7 +13,11 @@
     <div>
       <p>
         <label>API Endpoint: </label>
-        <input id="api-endpoint" type="text" value="https://nguerrera-translator.cognitiveservices.azure.com/sts/v1.0/issuetoken">
+        <!-- FEEDBACK: It took me quite a while trying to use the endpoint to my
+                       resource the azure portal gave me next to key, when in fact
+                       I had to use the URL below. The most strange thing was that
+                       I got 200 OK with no results from my resource URL. -->
+        <input id="api-endpoint" type="text" value="https://api.cognitive.microsofttranslator.com">
       </p>
       <p>
         <label>API Key:</label>
@@ -30,8 +34,8 @@
     </div>
     <textarea id="source-text"></textarea>
     <br>
-    <button id="translate-button">Translate</button>
-    <button id="swap-button">Swap</button>
+    <button type="button" id="translate-button">Translate</button>
+    <button type="button" id="swap-button">Swap</button>
     <br>
     <textarea id="target-text" readonly></textarea>
   </form>
