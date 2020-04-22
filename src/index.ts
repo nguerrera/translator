@@ -1,35 +1,39 @@
-import { CognitiveServicesCredentials } from "@azure/ms-rest-azure-js";
-import { TranslatorTextClient, TranslatorTextModels } from "@azure/cognitiveservices-translatortext";
+import { CognitiveServicesCredentials } from '@azure/ms-rest-azure-js';
+import { TranslatorTextClient } from '@azure/cognitiveservices-translatortext';
 
-window.addEventListener("DOMContentLoaded", () => init());
+type InputElementId = 'api-endpoint' | 'api-key' | 'translate-button' | 'swap-button';
+type TextAreaElementId = 'source-text' | 'target-text';
 
-function init() {
-  document.getElementById("translate-button")!.addEventListener("click", async () => await translate());
-  document.getElementById("swap-button")!.addEventListener("click", async () => await swap())
+function getTextArea(id: TextAreaElementId) {
+  return document.getElementById(id) as HTMLTextAreaElement;
 }
 
-async function translate() {
-  let apiEndpoint = document.getElementById("api-endpoint") as HTMLInputElement;
-  let apiKey = document.getElementById("api-key") as HTMLInputElement;
-  let sourceText = document.getElementById("source-text") as HTMLTextAreaElement;
-  let targetText = document.getElementById("target-text") as HTMLTextAreaElement;
+function getInput(id: InputElementId) {
+  return document.getElementById(id) as HTMLInputElement;
+}
 
+window.addEventListener('DOMContentLoaded', () => {
+  getInput('translate-button').addEventListener('click', async () => await translate());
+  getInput('swap-button').addEventListener('click', async () => await swap());
+});
+
+async function translate() {
+  const apiEndpoint = getInput('api-endpoint');
+  const apiKey = getInput('api-key');
+  const sourceText = getTextArea('source-text');
+  const targetText = getTextArea('target-text');
 
   try {
-    let credentials = new CognitiveServicesCredentials(apiKey.value);
-    let client = new TranslatorTextClient(credentials, apiEndpoint.value);
+    const credential = new CognitiveServicesCredentials(apiKey.value);
+    const client = new TranslatorTextClient(credential, apiEndpoint.value);
 
-    // FEEDBACK: detect returns DetectItemResult[], which doesn't appear to be
-    //           defined correctly, it has only a text property whil the actual
-    //           response has language, score, isTranslationSupported,
-    //           isTransliterationSupported, and alternatives. I'm having to use
-    //           any[] and spelunk around in the debugger to find the
-    //           properties;
-    let result = await client.translator.detect([{ text: sourceText.value }]) as any[];
+    // FEEDBACK: any[] due to https://github.com/Azure/azure-rest-api-specs/issues/9180
+    const result: any[] = await client.translator.detect([{ text: sourceText.value }]);
 
     if (result.length == 1) {
-      console.log(result);
-      targetText.value = "Looks like that's writen in '" + result[0].language +"'.\n\nTranslation support not implemented yet."
+      targetText.value =
+        `Looks like that's writen in ${result[0].language}.\n` +
+        `Translation support is not implemented yet.`;
     }
   } catch (error) {
     targetText.value = error.toString();
@@ -37,9 +41,9 @@ async function translate() {
 }
 
 async function swap() {
-  let sourceText = document.getElementById("source-text") as HTMLTextAreaElement;
-  let targetText = document.getElementById("target-text") as HTMLTextAreaElement;
+  const sourceText = getTextArea('source-text');
+  const targetText = getTextArea('target-text');
 
   sourceText.value = targetText.value;
-  await translate();
+  await translate()
 }
