@@ -1,4 +1,5 @@
 import { CognitiveServicesCredentials } from '@azure/ms-rest-azure-js';
+import { RestError } from '@azure/ms-rest-js';
 import { TranslatorTextClient, Translator } from '@azure/cognitiveservices-translatortext';
 
 type InputElementId = 'api-endpoint' | 'api-key';
@@ -118,6 +119,15 @@ function newOption(value: string, text: string) {
 
 function reportError(error: any) {
   console.error(error);
+
+  if (error instanceof RestError) {
+    // FEEDBACK
+    console.log("Why is this JSON for the whole error, rather than just the message?");
+    console.log(error.message);
+    console.log("And why is the error code in the JSON above, but not in the code property below?")
+    console.log(error.code);
+  }
+
   targetTextArea.value = error;
 }
 
