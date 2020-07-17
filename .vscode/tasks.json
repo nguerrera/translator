@@ -13,6 +13,6 @@
       },
       "label": "npm: build",
       "detail": "webpack -p"
-    },
+    }
   ]
 }
