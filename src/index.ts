@@ -1,18 +1,20 @@
 import { CognitiveServicesCredentials } from '@azure/ms-rest-azure-js';
 import { TranslatorTextClient, Translator } from '@azure/cognitiveservices-translatortext';
+import { EventHubProducerClient } from "@azure/event-hubs";
 
-type InputElementId = 'api-endpoint' | 'api-key';
+type InputElementId = 'translator-api-key' | 'event-hub-connection-string';
 type SelectElementId = 'source-language' | 'target-language';
 type TextAreaElementId = 'source-text' | 'target-text';
 type ButtonElementId = 'translate-button' | 'swap-button';
 
-let apiEndpointInput: HTMLInputElement;
-let apiKeyInput: HTMLInputElement;
+let translatorApiKeyInput: HTMLInputElement;
+let eventHubConnectionStringInput: HTMLInputElement;
 let sourceLanguageSelect: HTMLSelectElement;
 let targetLanguageSelect: HTMLSelectElement;
 let sourceTextArea: HTMLTextAreaElement;
 let targetTextArea: HTMLTextAreaElement;
 let translator: Translator | undefined;
+let producer: EventHubProducerClient | undefined;
 
 function getInput(id: InputElementId, changeListener: () => any) {
   const input = document.getElementById(id) as HTMLInputElement;
@@ -34,8 +36,8 @@ function getTextArea(id: TextAreaElementId) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  apiEndpointInput = getInput('api-endpoint', apiOptionsChanged);
-  apiKeyInput = getInput('api-key', apiOptionsChanged);
+  translatorApiKeyInput = getInput('translator-api-key', apiOptionsChanged);
+  eventHubConnectionStringInput = getInput('event-hub-connection-string', apiOptionsChanged);
   sourceLanguageSelect = getSelect('source-language');
   targetLanguageSelect = getSelect('target-language');
   sourceTextArea = getTextArea('source-text');
@@ -55,10 +57,13 @@ async function apiOptionsChanged() {
     // wait until after we've fetched all available languages above, which does
     // not require authentication, before reporting that we don't have a key
     // here.
-    if (apiKeyInput.value.length == 0) {
+    if (translatorApiKeyInput.value.length == 0) {
       throw 'Error: API key required';
     }
 
+    if (eventHubConnectionStringInput.value.length > 0) {
+      producer = new EventHubProducerClient(eventHubConnectionStringInput.value, 'event-hub')
+    }
     translator = t;
     targetTextArea.value = '';
   } catch (error) {
@@ -67,11 +72,7 @@ async function apiOptionsChanged() {
 }
 
 function newTranslator() {
-  if (apiEndpointInput.value.length == 0) {
-    throw 'Error: API Endpoint required.';
-  }
-
-  let key = apiKeyInput.value;
+  let key = translatorApiKeyInput.value;
   if (key.length == 0) {
     // we can enumerate available languages without authenticating
     key = '________________________________';
@@ -83,7 +84,7 @@ function newTranslator() {
   }
 
   const credential = new CognitiveServicesCredentials(key);
-  const client = new TranslatorTextClient(credential, apiEndpointInput.value);
+  const client = new TranslatorTextClient(credential, 'https://api.cognitive.microsofttranslator.com');
   return client.translator;
 }
 
@@ -132,9 +133,26 @@ async function translate() {
       [{ text: sourceTextArea.value }],
       { from: sourceLanguageSelect.value });
 
-    targetTextArea.value = result![0].translations![0].text!;
+    const targetText = result![0].translations![0].text!;
+    targetTextArea.value = targetText;
+
+    await log({
+      operation: 'translate',
+      sourceLanguage: sourceLanguageSelect.value,
+      targetLanguage: targetLanguageSelect.value,
+      sourceText: sourceTextArea.value,
+      targetText
+    });
   } catch (error) {
     reportError(error);
+  }
+}
+
+async function log(event: any) {
+  if (producer) {
+    const batch = await producer.createBatch();
+    batch.tryAdd({ body: event});
+    await producer.sendBatch(batch);
   }
 }
 
