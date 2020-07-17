@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@azure/cognitiveservices-translatortext": "^1.0.0",
+    "@azure/event-hubs": "^5.2.2",
     "@azure/ms-rest-azure-js": "^2.0.1",
     "ts-loader": "^7.0.1",
     "typescript": "^3.8.3",
